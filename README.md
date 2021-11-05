@@ -2,7 +2,7 @@
 
 ## Info 
 
-This handles deployment for a public http api with iam authentication, integrated lambda, and iam role to execute specific route by a specific iam user (for experimental testing).
+This handles deployment for a public http api with integrated lambda, and lambda (custom) authorizer.
 
 Http Apis are designed for low-latency and cost-effective integrations, however the purpose of this deployment is to cover iam authentication with Http Apis.
 
