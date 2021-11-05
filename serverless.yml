@@ -1,0 +1,105 @@
+service: customAuthApi
+
+variablesResolutionMode: 20210326
+
+plugins:
+  - serverless-esbuild
+  - serverless-s3-cleaner
+  - serverless-iam-roles-per-function
+
+package:
+  individually: true
+  patterns:
+    - '!node_modules/**'
+    - '!.serverless/**'
+
+custom:
+  baseName: ${self:provider.stage}-${self:service}
+
+  esbuild:
+    target: node14
+    minify: true
+    sourcemap: true
+    concurrency: 5
+  
+  serverless-s3-cleaner:
+    buckets:
+      - ${cf:${self:custom.baseName}.ServerlessDeploymentBucketName, ''}
+
+  serverless-iam-roles-per-function:
+    defaultInherit: true
+  
+
+provider:
+  name: aws
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+  stackName: ${self:custom.baseName}
+  deploymentBucket:
+    blockPublicAccess: true
+    maxPreviousDeploymentArtifacts: 2
+  runtime: nodejs14.x
+  memorySize: 128
+  timeout: 25
+  versionFunctions: false
+  logRetentionInDays: 7
+  logs:
+    httpApi: true
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    NODE_OPTIONS: "--enable-source-maps"
+  httpApi:
+    disableDefaultEndpoint: false
+    shouldStartNameWithService: true
+    cors:
+      allowedOrigins: 
+        - '*'
+      allowedMethods:
+        - GET
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+    authorizers:
+      customAuthorizer:
+        type: request
+        functionName: authorizer
+        enableSimpleResponses: true
+        identitySource:
+          - $request.header.Authorization
+  iam:
+    role:
+      name: ${self:custom.baseName}
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:log-stream:*
+
+functions:
+  query:
+    name: ${self:custom.baseName}-query
+    handler: src/query/index.handler
+    events:
+      - httpApi:
+          path: /query/{id}
+          method: GET
+          authorizer:
+            name: customAuthorizer
+  authorizer:
+    name: ${self:custom.baseName}-authorizer
+    handler: src/authorizer/index.handler
+
+
+resources:
+  Resources:
+
+    # SSM
+
+    EndpointDomainParam:
+      Type: AWS::SSM::Parameter
+      Properties:
+        Name: /${self:service}/${self:provider.stage}/endpointUrl
+        Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+        Type: String
