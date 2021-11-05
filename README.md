@@ -56,7 +56,7 @@ yarn run invoke <function-name>
 ### Test Deployed Api:
 
 ```bash
-yarn run execute
+bash test-auth.sh
 ```
 
 ### Remove:
