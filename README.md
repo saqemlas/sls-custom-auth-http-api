@@ -4,7 +4,7 @@
 
 This handles deployment for a public http api with integrated lambda, and lambda (custom) authorizer.
 
-Http Apis are designed for low-latency and cost-effective integrations, however the purpose of this deployment is to cover iam authentication with Http Apis.
+Http Apis are designed for low-latency and cost-effective integrations, however the purpose of this deployment is to cover (custom) lambda authentication with Http Apis.
 
 A Lambda authorizer (formerly known as a custom authorizer) is an API Gateway feature that uses a Lambda function to control access to your API. A Lambda authorizer is useful if you want to implement a custom authorization scheme that uses a bearer token authentication strategy such as OAuth or SAML, or that uses request parameters to determine the caller's identity. When a client makes a request to one of your API's methods, API Gateway calls your Lambda authorizer, which takes the caller's identity as input and returns an IAM policy as output.
 
