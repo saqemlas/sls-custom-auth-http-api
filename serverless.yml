@@ -1,4 +1,4 @@
-service: customAuthApi
+service: customauth
 
 variablesResolutionMode: 20210326
 
@@ -14,7 +14,8 @@ package:
     - '!.serverless/**'
 
 custom:
-  baseName: ${self:provider.stage}-${self:service}
+  project: template
+  baseName: ${self:custom.project}-${self:service}-${self:provider.stage}
 
   esbuild:
     target: node14
