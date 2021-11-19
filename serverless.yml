@@ -20,7 +20,6 @@ custom:
     target: node14
     minify: true
     sourcemap: true
-    concurrency: 5
   
   serverless-s3-cleaner:
     buckets:
@@ -37,7 +36,6 @@ provider:
   stackName: ${self:custom.baseName}
   deploymentBucket:
     blockPublicAccess: true
-    maxPreviousDeploymentArtifacts: 2
   runtime: nodejs14.x
   memorySize: 128
   timeout: 25
