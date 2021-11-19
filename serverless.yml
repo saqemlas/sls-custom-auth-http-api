@@ -19,6 +19,7 @@ custom:
 
   esbuild:
     target: node14
+    packager: yarn
     minify: true
     sourcemap: true
   
